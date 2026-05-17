@@ -6,9 +6,10 @@ const session = require("express-session");
 const app = express();
 
 // MongoDB Connection
-mongoose.connect("mongodb://127.0.0.1:27017/studentDB")
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/studentDB";
+mongoose.connect(MONGODB_URI)
 .then(() => {
-    console.log("MongoDB Connected");
+    console.log("MongoDB Connected to " + (process.env.MONGODB_URI ? "Cloud" : "Local"));
 })
 .catch((err) => {
     console.log(err);
@@ -107,6 +108,11 @@ app.post("/submit", async (req, res) => {
 });
 
 // Server
-app.listen(3000, () => {
-    console.log("Server Started on Port 3000");
-});
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(3000, () => {
+        console.log("Server Started on Port 3000");
+    });
+}
+
+// Export for Vercel
+module.exports = app;
